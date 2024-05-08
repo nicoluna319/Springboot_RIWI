@@ -21,6 +21,7 @@ public class ServiceReq {
 
     private String name;
     private String description;
+    @NotNull(message = "El precio del servicio es requerido.")
     @DecimalMin(
         value = "0.01",
         message = "El valor del servicio debe ser mayor a cero")

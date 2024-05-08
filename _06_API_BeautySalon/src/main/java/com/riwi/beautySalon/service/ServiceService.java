@@ -12,12 +12,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.riwi.beautySalon.api.dto.request.ServiceReq;
 import com.riwi.beautySalon.api.dto.response.ServiceResp;
+
+import com.riwi.beautySalon.domain.entities.ServiceEntity;
 import com.riwi.beautySalon.domain.repositories.ServiceRepository;
 import com.riwi.beautySalon.infrastructure.abstract_services.IServiceService;
 import com.riwi.beautySalon.utils.enums.SortType;
-
+import com.riwi.beautySalon.utils.exception.BadRequestException;
+import com.riwi.beautySalon.utils.messages.ErrorMessages;
 
 import lombok.AllArgsConstructor;
+
 
 @Service
 @Transactional
@@ -31,25 +35,32 @@ public class ServiceService implements IServiceService {
     @Override
     public ServiceResp create(ServiceReq request) {
 
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        ServiceEntity service = this.requestToEntity(request);
+        return this.entityToResp(this.serviceRepository.save(service));
     }
 
     @Override
     public ServiceResp get(Long id) {
 
-        throw new UnsupportedOperationException("Unimplemented method 'get'");
+        return this.entityToResp(this.find(id));
     }
 
     @Override
     public ServiceResp update(ServiceReq request, Long id) {
 
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        ServiceEntity service = this.find(id);
+
+        service = this.requestToEntity(request);
+        service.setId(id);
+
+        return this.entityToResp(this.serviceRepository.save(service));
+
     }
 
     @Override
     public void delete(Long id) {
 
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    this.serviceRepository.delete(this.find(id));
     }
 
     @Override
@@ -66,7 +77,8 @@ public class ServiceService implements IServiceService {
         }
         this.serviceRepository.findAll(pagination);
 
-        return null;
+        return this.serviceRepository.findAll(pagination)
+        .map(this:: entityToResp);
     }
 
     @Override
@@ -75,4 +87,27 @@ public class ServiceService implements IServiceService {
         throw new UnsupportedOperationException("Unimplemented method 'search'");
     }
     
+    private ServiceResp entityToResp(ServiceEntity entity){
+
+        return ServiceResp.builder()
+        .id(entity.getId())
+        .name(entity.getName())
+        .price(entity.getPrice())
+        .description(entity.getDescription())
+        .build();
+    }
+
+    private ServiceEntity requestToEntity(ServiceReq request){
+
+        return ServiceEntity.builder()
+                    .name(request.getName())
+                    .price(request.getPrice())
+                    .description(request.getDescription())
+                    .build();
+    }
+    private ServiceEntity find(Long id){
+
+        return this.serviceRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException(ErrorMessages.IdNotFound("servicio")));
+    }
 }

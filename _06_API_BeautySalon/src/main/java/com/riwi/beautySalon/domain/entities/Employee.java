@@ -46,7 +46,7 @@ public class Employee {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @OneToMany(
-    mappedBy = "service", 
+    mappedBy = "employee", 
     fetch = FetchType.EAGER, 
     cascade = CascadeType.ALL,
     orphanRemoval = false)

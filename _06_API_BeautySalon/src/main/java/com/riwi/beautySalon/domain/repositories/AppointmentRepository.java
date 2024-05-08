@@ -11,6 +11,6 @@ import com.riwi.beautySalon.domain.entities.Appointment;
 public interface AppointmentRepository 
 extends JpaRepository<Appointment, Long>{
     
-    @Query("select p from appointment p join fetch p.client c where c.id = idClient")
+    @Query("select p from appointment p join fetch p.client c where c.id = :idClient")
     public Optional<Appointment> findByClientId(Long idClient);
 }
